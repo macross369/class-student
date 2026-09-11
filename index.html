@@ -24,16 +24,20 @@
       appId: "1:72239145373:web:aa7d298c62acfff0078f74"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.db = db;
-    window.doc = doc;
-    window.setDoc = setDoc;
-    window.onSnapshot = onSnapshot;
+    try {
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      window.db = db;
+      window.doc = doc;
+      window.setDoc = setDoc;
+      window.onSnapshot = onSnapshot;
 
-    // 啟動雲端即時同步監聽
-    if (typeof window.initFirebaseSync === 'function') {
-      window.initFirebaseSync();
+      // 啟動雲端即時同步監聽
+      if (typeof window.initFirebaseSync === 'function') {
+        window.initFirebaseSync();
+      }
+    } catch (err) {
+      console.warn("Firebase 初始化提示 (啟用離線本機儲存):", err);
     }
   </script>
 
@@ -115,7 +119,7 @@
           <i class="fa-solid fa-calendar-days text-slate-400"></i>學期日程
         </button>
         
-        <!-- 資料匯出按鈕（公開可用） -->
+        <!-- 資料匯出按鈕 -->
         <button onclick="openExportModal()" class="text-xs font-bold bg-white hover:bg-sky-50 border border-sky-200 text-sky-700 px-3 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1.5" title="匯出生活習慣、打掃工作與學生名單">
           <i class="fa-solid fa-file-export text-sky-500"></i>匯出資料
         </button>
@@ -250,7 +254,6 @@
               </tr>
             </thead>
             <tbody id="habitsTableBody" class="divide-y divide-amber-100/60">
-              <!-- 動態渲染常規項目列 -->
             </tbody>
           </table>
         </div>
@@ -278,7 +281,7 @@
             <!-- 工作項目卡片清單 -->
             <div id="tasksBackHallway" class="grid grid-cols-1 gap-1.5"></div>
           </div>
-          <!-- 負責人區 (每週獨立記錄) -->
+          <!-- 負責人區 -->
           <div class="mt-3 pt-2.5 border-t border-sky-100">
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs font-black text-sky-900 flex items-center gap-1">
@@ -305,10 +308,10 @@
                 <span id="badgeClassroom" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">0/0 完成</span>
               </div>
             </div>
-            <!-- 工作項目卡片清單 (雙欄網格) -->
+            <!-- 工作項目卡片清單 -->
             <div id="tasksClassroom" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5"></div>
           </div>
-          <!-- 負責人區 (每週獨立記錄) -->
+          <!-- 負責人區 -->
           <div class="mt-3 pt-2.5 border-t border-amber-100">
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs font-black text-amber-900 flex items-center gap-1">
@@ -338,7 +341,7 @@
             <!-- 工作項目卡片清單 -->
             <div id="tasksFrontHallway" class="grid grid-cols-1 gap-1.5"></div>
           </div>
-          <!-- 負責人區 (每週獨立記錄) -->
+          <!-- 負責人區 -->
           <div class="mt-3 pt-2.5 border-t border-emerald-100">
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs font-black text-emerald-900 flex items-center gap-1">
@@ -371,7 +374,7 @@
             </button>
           </div>
         </div>
-        <!-- 6 個櫃子工作卡片 (每週個別指定學生) -->
+        <!-- 6 個櫃子工作卡片 -->
         <div id="tasksCabinets" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2"></div>
       </div>
     </section>
@@ -404,7 +407,7 @@
 
   <!-- 彈出視窗 2：學生名單設定 -->
   <div id="studentModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-amber-200 max-h-[90vh] flex flex-col">
+    <div class="bg-white rounded-3xl p-6 max-w-xl w-full shadow-2xl border border-amber-200 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2">
           <span class="text-lg">🎒</span>
@@ -414,12 +417,12 @@
       </div>
       <div id="studentListContainer" class="space-y-2 overflow-y-auto custom-scrollbar flex-1 pr-1"></div>
       <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-2 mt-2">
-        <button onclick="addNewStudentRow()" class="text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-2 rounded-xl transition">
-          + 新增學生
+        <button onclick="addNewStudentRow()" class="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-2 rounded-xl transition flex items-center gap-1">
+          <i class="fa-solid fa-user-plus text-xs"></i> 新增學生
         </button>
         <div class="flex items-center gap-2">
           <button onclick="closeStudentModal()" class="text-xs font-bold text-slate-600 px-3 py-2 rounded-xl hover:bg-slate-100 transition">取消</button>
-          <button onclick="saveStudentsData()" class="text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 px-4 py-2 rounded-xl shadow-sm transition">儲存並同步</button>
+          <button onclick="saveStudentsData()" class="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl shadow-sm transition">儲存變更</button>
         </div>
       </div>
     </div>
@@ -482,7 +485,7 @@
     </div>
   </div>
 
-  <!-- 彈出視窗 5：圖示挑選器 (48款校園與生活圖示) -->
+  <!-- 彈出視窗 5：圖示挑選器 -->
   <div id="iconPickerModal" class="hidden fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-5 max-w-md w-full shadow-2xl border border-amber-200">
       <div class="flex items-center justify-between mb-3">
@@ -551,27 +554,28 @@
           </button>
         </div>
 
-        <!-- 匯出項目四：完整系統備份 (JSON) -->
-        <div class="p-3.5 rounded-2xl bg-sky-50/50 border border-sky-200 flex items-center justify-between">
+        <!-- 一鍵匯出所有資料 (完整備份) -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-pink-50 border-2 border-purple-200 flex items-center justify-between shadow-2xs">
           <div>
-            <h5 class="text-xs font-black text-sky-950 flex items-center gap-1.5">
-              <i class="fa-solid fa-database text-sky-500"></i>完整系統備份檔 (JSON)
+            <h5 class="text-xs font-black text-purple-900 flex items-center gap-1.5">
+              <i class="fa-solid fa-box-archive text-purple-600 text-sm"></i>一鍵匯出所有資料（完整系統備份包）
             </h5>
-            <p class="text-[11px] text-slate-400 mt-0.5">匯出包含學生、學期、檢核及每週打掃的所有資料</p>
+            <p class="text-[11px] text-purple-700/80 mt-0.5">一次打包全部學生、學期、每週打掃輪值與每日常規評核紀錄，支援一鍵完整還原</p>
           </div>
-          <button onclick="exportFullJSON()" class="text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded-xl shadow-xs transition shrink-0">
-            備份 JSON
+          <button onclick="exportFullJSON()" class="text-xs font-black bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl shadow-xs transition shrink-0 flex items-center gap-1.5">
+            <i class="fa-solid fa-download"></i>一鍵匯出全部
           </button>
         </div>
       </div>
 
-      <div class="pt-4 border-t border-slate-100 text-right mt-3">
-        <button onclick="closeExportModal()" class="text-xs font-bold text-slate-600 px-4 py-2 rounded-xl hover:bg-slate-100 transition">關閉</button>
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between mt-3">
+        <span class="text-[11px] text-slate-400 font-medium">匯出的 CSV 檔案均支援 Excel 直接開啟</span>
+        <button onclick="closeExportModal()" class="text-xs font-bold text-slate-600 px-4 py-1.5 rounded-xl hover:bg-slate-100 transition">關閉</button>
       </div>
     </div>
   </div>
 
-  <!-- 彈出視窗 7：資料匯入對話框（教師專屬） -->
+  <!-- 彈出視窗 7：資料匯入對話框（教師專屬，支援一鍵完整還原與個別匯入） -->
   <div id="importModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-purple-200 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
@@ -580,58 +584,91 @@
             <i class="fa-solid fa-file-import"></i>
           </div>
           <div>
-            <h4 class="font-black text-slate-800 text-base">班級常規與設定資料匯入</h4>
+            <h4 class="font-black text-slate-800 text-base">班級資料匯入管理</h4>
             <span class="text-[11px] text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">教師權限專用</span>
           </div>
         </div>
         <button onclick="closeImportModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <p class="text-xs text-slate-500 mb-3">請選擇您要匯入的檔案類型。匯入成功後將自動即時同步至 Firebase 雲端與所有載具。</p>
+      <p class="text-xs text-slate-500 mb-3">
+        支援<strong>一鍵匯入所有資料（完整備份包 .json）</strong>，亦支援個別匯入<strong>學生名單</strong>、<strong>生活常規</strong>或<strong>打掃工作</strong> CSV。系統將自動辨識類型。
+      </p>
 
-      <div class="space-y-4 overflow-y-auto custom-scrollbar flex-1 pr-1">
-        <!-- 方式一：完整 JSON 備份檔匯入 -->
-        <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-200 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <h5 class="text-xs font-black text-purple-950 flex items-center gap-1.5">
-              <i class="fa-solid fa-database text-purple-600"></i>還原系統完整備份檔 (.json)
-            </h5>
-            <span class="text-[10px] bg-purple-200/60 text-purple-900 font-bold px-2 py-0.5 rounded-full">最推薦</span>
+      <div class="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-1">
+        <!-- 檔案上傳區 -->
+        <div class="border-2 border-dashed border-purple-200 hover:border-purple-400 rounded-2xl p-4 text-center bg-purple-50/30 transition cursor-pointer" onclick="document.getElementById('smartFileInput').click()">
+          <input type="file" id="smartFileInput" accept=".json,.csv,.txt,application/json,text/csv,text/plain" class="hidden" onchange="handleSmartFileSelect(event)">
+          <div class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center mx-auto text-lg mb-2">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
           </div>
-          <p class="text-[11px] text-slate-500">可還原由本系統匯出之 JSON 檔案，完整復原學生名單、學期起訖、生活常規紀錄及每週打掃負責人配置。</p>
-          <div class="flex items-center gap-2 pt-1">
-            <input type="file" id="jsonFileInput" accept=".json,application/json" class="hidden" onchange="handleJsonFileSelect(event)">
-            <button onclick="document.getElementById('jsonFileInput').click()" class="text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-2 rounded-xl shadow-xs transition flex items-center gap-1.5">
-              <i class="fa-solid fa-folder-open"></i>選擇 JSON 備份檔
-            </button>
-            <span id="jsonFileNameDisplay" class="text-xs text-slate-400 italic truncate max-w-[200px]">尚未選取檔案</span>
+          <p class="text-xs font-black text-purple-900">點此選取檔案（一鍵備份檔 .json 或個別資料 .csv）</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">系統將自動分析檔案格式並提供對應還原選項</p>
+          <div class="mt-2.5">
+            <span class="text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-1.5 rounded-xl shadow-xs inline-flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-folder-open"></i>選取檔案
+            </span>
           </div>
         </div>
 
-        <!-- 方式二：學生名單 CSV / TXT 匯入 -->
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <h5 class="text-xs font-black text-slate-800 flex items-center gap-1.5">
-              <i class="fa-solid fa-users text-slate-600"></i>批次匯入學生名單 (.csv / .txt)
-            </h5>
+        <!-- 檔案解析預覽卡片（選檔後動態顯現） -->
+        <div id="importFilePreviewCard" class="hidden p-3.5 rounded-2xl border bg-white shadow-xs space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span id="previewFileIcon" class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs shrink-0">
+                <i class="fa-solid fa-file"></i>
+              </span>
+              <div class="min-w-0">
+                <h5 id="previewFileName" class="text-xs font-black text-slate-800 truncate">未選取檔案</h5>
+                <p id="previewFileTypeBadge" class="text-[10px] font-bold text-purple-700">正在分析格式...</p>
+              </div>
+            </div>
+            <span id="previewFileSize" class="text-[10px] text-slate-400 font-medium shrink-0 ml-2"></span>
           </div>
-          <p class="text-[11px] text-slate-500">支援上傳由本系統匯出的「學生名單 CSV」，或每行一個學生姓名的純文字檔，系統將自動隨機分配代表色。</p>
-          <div class="flex items-center gap-2 pt-1">
-            <input type="file" id="csvFileInput" accept=".csv,.txt,text/plain,text/csv" class="hidden" onchange="handleCsvFileSelect(event)">
-            <button onclick="document.getElementById('csvFileInput').click()" class="text-xs font-bold bg-slate-700 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl shadow-xs transition flex items-center gap-1.5">
-              <i class="fa-solid fa-file-csv"></i>選擇名單檔案
+
+          <!-- 解析摘要文字 -->
+          <div id="previewSummaryContent" class="text-xs text-slate-600 bg-slate-50 rounded-xl p-2.5 space-y-1">
+            載入中...
+          </div>
+
+          <!-- 匯入執行按鈕 -->
+          <div class="pt-1 flex items-center justify-end gap-2">
+            <button onclick="resetImportFileInput()" class="text-xs font-bold text-slate-500 hover:text-slate-700 px-3 py-1.5 rounded-xl transition">重新選檔</button>
+            <button id="btnExecuteSmartImport" onclick="confirmAndExecuteImport()" class="text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-xl shadow-xs transition flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check"></i><span id="btnExecuteText">確認匯入</span>
             </button>
-            <span id="csvFileNameDisplay" class="text-xs text-slate-400 italic truncate max-w-[200px]">尚未選取檔案</span>
           </div>
         </div>
       </div>
 
-      <div class="pt-4 border-t border-slate-100 flex items-center justify-between mt-3">
-        <span class="text-[11px] text-amber-700 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i>匯入將覆蓋現有相同欄位資料</span>
-        <button onclick="closeImportModal()" class="text-xs font-bold text-slate-600 px-4 py-2 rounded-xl hover:bg-slate-100 transition">關閉</button>
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between mt-2">
+        <span class="text-[11px] text-amber-700 font-bold"><i class="fa-solid fa-shield-halved mr-1"></i>匯入將覆蓋對應項目的既有資料</span>
+        <button onclick="closeImportModal()" class="text-xs font-bold text-slate-600 px-4 py-1.5 rounded-xl hover:bg-slate-100 transition">關閉</button>
       </div>
     </div>
   </div>
+
+  <!-- 自訂確認視窗（替代瀏覽器原生 confirm，確保沙箱環境 100% 正常彈出） -->
+  <div id="customConfirmModal" class="hidden fixed inset-0 z-[70] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-5 max-w-sm w-full shadow-2xl border border-amber-200 space-y-3.5">
+      <div class="flex items-center gap-3">
+        <div id="customConfirmIcon" class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg shrink-0">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h4 id="customConfirmTitle" class="font-black text-slate-800 text-sm">確認操作</h4>
+          <p id="customConfirmMessage" class="text-xs text-slate-500 mt-0.5 leading-relaxed">您確定要執行此操作嗎？</p>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+        <button id="btnCustomConfirmCancel" class="px-3.5 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition">取消</button>
+        <button id="btnCustomConfirmOk" class="px-4 py-1.5 text-xs font-black text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-xs transition">確定執行</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 浮動通知容器（取代原生 alert） -->
+  <div id="customToastContainer" class="fixed top-4 right-4 z-[80] flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- 主邏輯 Script -->
   <script>
@@ -742,8 +779,44 @@
       cleaningRecords: {}
     };
 
-    let AppState = JSON.parse(localStorage.getItem('qifeng_app_state') || 'null') || DEFAULT_DATA;
-    if (!AppState.weekAssignees) AppState.weekAssignees = {};
+    // 狀態資料清洗與容錯校正函式（防禦性修復舊格式與缺漏欄位）
+    function sanitizeAppState(data) {
+      if (!data || typeof data !== 'object') data = {};
+      const defaultCleaning = DEFAULT_DATA.cleaningTasks;
+      const rawTasks = (data.cleaningTasks && typeof data.cleaningTasks === 'object') ? data.cleaningTasks : {};
+
+      const safeCleaningTasks = {
+        backHallway: Array.isArray(rawTasks.backHallway) && rawTasks.backHallway.length > 0 ? rawTasks.backHallway : defaultCleaning.backHallway,
+        classroomMerged: Array.isArray(rawTasks.classroomMerged) && rawTasks.classroomMerged.length > 0 ? rawTasks.classroomMerged : defaultCleaning.classroomMerged,
+        frontHallway: Array.isArray(rawTasks.frontHallway) && rawTasks.frontHallway.length > 0 ? rawTasks.frontHallway : defaultCleaning.frontHallway,
+        cabinets: Array.isArray(rawTasks.cabinets) && rawTasks.cabinets.length > 0 ? rawTasks.cabinets : defaultCleaning.cabinets
+      };
+
+      const sanitized = {
+        ...DEFAULT_DATA,
+        ...data,
+        students: Array.isArray(data.students) && data.students.length > 0 ? data.students : DEFAULT_DATA.students,
+        semesters: Array.isArray(data.semesters) && data.semesters.length > 0 ? data.semesters : DEFAULT_DATA.semesters,
+        cleaningTasks: safeCleaningTasks,
+        weekAssignees: (data.weekAssignees && typeof data.weekAssignees === 'object') ? data.weekAssignees : {},
+        assignees: (data.assignees && typeof data.assignees === 'object') ? { ...DEFAULT_DATA.assignees, ...data.assignees } : JSON.parse(JSON.stringify(BASE_DEFAULT_ASSIGNEES)),
+        habitsRecords: (data.habitsRecords && typeof data.habitsRecords === 'object') ? data.habitsRecords : {},
+        cleaningRecords: (data.cleaningRecords && typeof data.cleaningRecords === 'object') ? data.cleaningRecords : {}
+      };
+
+      // 確保學期 ID 有效，否則取第一個學期
+      if (!sanitized.semesters.some(s => s.id === sanitized.currentSemesterId)) {
+        sanitized.currentSemesterId = sanitized.semesters[0]?.id || '115-1';
+      }
+
+      // 確保週次為有效數值
+      const weekNum = parseInt(sanitized.currentWeekNum, 10);
+      sanitized.currentWeekNum = (Number.isInteger(weekNum) && weekNum >= 1 && weekNum <= 22) ? weekNum : 1;
+
+      return sanitized;
+    }
+
+    let AppState = sanitizeAppState(JSON.parse(localStorage.getItem('qifeng_app_state') || 'null'));
 
     let isTeacherLoggedIn = false;
     let activeConfigTab = 'backHallway';
@@ -751,12 +824,15 @@
 
     // 取得當前週次的唯一鍵值
     function getCurrentWeekKey() {
-      return `${AppState.currentSemesterId}_${AppState.currentWeekNum}`;
+      const semId = AppState.currentSemesterId || '115-1';
+      const wNum = AppState.currentWeekNum || 1;
+      return `${semId}_${wNum}`;
     }
 
     // 取得當前週次專屬負責人資料
     function getCurrentWeekAssignees() {
       const weekKey = getCurrentWeekKey();
+      if (!AppState.weekAssignees) AppState.weekAssignees = {};
       if (!AppState.weekAssignees[weekKey]) {
         const template = AppState.assignees || BASE_DEFAULT_ASSIGNEES;
         AppState.weekAssignees[weekKey] = JSON.parse(JSON.stringify(template));
@@ -770,41 +846,56 @@
 
     // Firebase 即時同步配置
     window.initFirebaseSync = function() {
-      if (!window.db) return;
-      const docRef = window.doc(window.db, "routineData", "mainState");
-      
-      window.onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          const cloudData = docSnap.data();
-          cloudData.isTeacherLoggedIn = isTeacherLoggedIn;
-          if (!cloudData.weekAssignees) cloudData.weekAssignees = {};
-          AppState = cloudData;
-          saveToLocal(false);
-          renderAll();
+      if (!window.db || !window.doc || !window.onSnapshot) return;
+      try {
+        const docRef = window.doc(window.db, "routineData", "mainState");
+        
+        window.onSnapshot(docRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const cloudData = docSnap.data();
+            cloudData.isTeacherLoggedIn = isTeacherLoggedIn;
+            AppState = sanitizeAppState(cloudData);
+            saveToLocal(false);
+            renderAll();
+            const syncEl = document.getElementById('syncIndicator');
+            if (syncEl) syncEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>已同步`;
+          } else {
+            syncToFirebase();
+          }
+        }, (error) => {
+          console.warn("Firebase 連線提示: 使用本機儲存備援", error);
           const syncEl = document.getElementById('syncIndicator');
-          if (syncEl) syncEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>已同步`;
-        } else {
-          syncToFirebase();
-        }
-      }, (error) => {
-        console.warn("Firebase 連線提示: 使用本機儲存備援", error);
-        const syncEl = document.getElementById('syncIndicator');
-        if (syncEl) syncEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>本機備援`;
-      });
+          if (syncEl) syncEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>本機備援`;
+        });
+      } catch (e) {
+        console.warn("Firebase 監聽啟動異常:", e);
+      }
     };
 
+    // 同步到 Firebase (避免相互遞迴)
     function syncToFirebase() {
-      saveToLocal(true);
-      if (!window.db) return;
-      const docRef = window.doc(window.db, "routineData", "mainState");
-      const dataToUpload = { ...AppState };
-      delete dataToUpload.isTeacherLoggedIn;
-      window.setDoc(docRef, dataToUpload).catch(e => console.error("Firebase 上傳失敗:", e));
+      if (!window.db || !window.doc || !window.setDoc) return;
+      try {
+        const docRef = window.doc(window.db, "routineData", "mainState");
+        const dataToUpload = { ...AppState };
+        delete dataToUpload.isTeacherLoggedIn;
+        window.setDoc(docRef, dataToUpload).catch(e => {
+          console.warn("Firebase 雲端寫入提示 (目前以本機為準):", e);
+        });
+      } catch (e) {
+        console.warn("Firebase 上傳異常:", e);
+      }
     }
 
     function saveToLocal(syncCloud = true) {
-      localStorage.setItem('qifeng_app_state', JSON.stringify(AppState));
-      if (syncCloud) syncToFirebase();
+      try {
+        localStorage.setItem('qifeng_app_state', JSON.stringify(AppState));
+      } catch (e) {
+        console.error("本地儲存失敗:", e);
+      }
+      if (syncCloud) {
+        syncToFirebase();
+      }
     }
 
     function getColorObj(name) {
@@ -812,7 +903,7 @@
     }
 
     function getStudentById(id) {
-      return AppState.students.find(s => s.id === id);
+      return (AppState.students || []).find(s => s.id === id);
     }
 
     // 分頁切換
@@ -837,7 +928,9 @@
 
     // 計算週次日期
     function getWeekDays(startDateStr, weekNum) {
-      const start = new Date(startDateStr);
+      if (!startDateStr) return ['08/31', '09/01', '09/02', '09/03', '09/04'];
+      const parts = startDateStr.split('-');
+      const start = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
       const mondayOffset = (weekNum - 1) * 7;
       const monday = new Date(start);
       monday.setDate(start.getDate() + mondayOffset);
@@ -920,7 +1013,6 @@
         authBtn.className = "text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1.5";
         notice.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i>教師權限已啟用（可自由勾選評核與匯入資料）`;
         notice.className = "text-[11px] text-emerald-800 bg-emerald-100/80 border border-emerald-200 px-2.5 py-1 rounded-xl font-bold";
-        // 顯示匯入按鈕
         if (btnImport) btnImport.classList.remove('hidden');
       } else {
         lockIcon.className = "fa-solid fa-lock";
@@ -928,7 +1020,6 @@
         authBtn.className = "text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1.5";
         notice.innerHTML = `<i class="fa-solid fa-lock mr-1"></i>唯讀中（需教師登入方可勾選修改）`;
         notice.className = "text-[11px] text-amber-700 bg-amber-100/70 border border-amber-200 px-2.5 py-1 rounded-xl";
-        // 隱藏匯入按鈕
         if (btnImport) btnImport.classList.add('hidden');
       }
     }
@@ -939,16 +1030,22 @@
         toggleTeacherAuth();
         return;
       }
-      const recordKey = `${AppState.currentSemesterId}_${AppState.currentWeekNum}_${studentId}_${habitKey}_${dayIndex}`;
+      if (!AppState.habitsRecords) AppState.habitsRecords = {};
+      const semId = AppState.currentSemesterId || '115-1';
+      const wNum = AppState.currentWeekNum || 1;
+      const recordKey = `${semId}_${wNum}_${studentId}_${habitKey}_${dayIndex}`;
       AppState.habitsRecords[recordKey] = !AppState.habitsRecords[recordKey];
       saveToLocal();
       renderHabitsTable();
       renderVIPBadges();
     };
 
-    // 勾選打掃工作 (免登入自由點選)
+    // 勾選打掃工作
     window.toggleCleaningTask = function(taskId) {
-      const recordKey = `${AppState.currentSemesterId}_${AppState.currentWeekNum}_${taskId}`;
+      if (!AppState.cleaningRecords) AppState.cleaningRecords = {};
+      const semId = AppState.currentSemesterId || '115-1';
+      const wNum = AppState.currentWeekNum || 1;
+      const recordKey = `${semId}_${wNum}_${taskId}`;
       AppState.cleaningRecords[recordKey] = !AppState.cleaningRecords[recordKey];
       saveToLocal();
       renderCleaningTasks();
@@ -956,13 +1053,24 @@
 
     // 清空當週打掃打卡
     window.resetCurrentWeekCleaning = function() {
-      if (!confirm("確定要清空本週所有的打掃完成標記嗎？")) return;
-      const prefix = `${AppState.currentSemesterId}_${AppState.currentWeekNum}_`;
-      Object.keys(AppState.cleaningRecords).forEach(k => {
-        if (k.startsWith(prefix)) delete AppState.cleaningRecords[k];
+      showCustomConfirm({
+        title: "清空打掃標記",
+        message: "確定要清空本週所有的打掃完成標記嗎？此操作將同步至雲端。",
+        confirmText: "確認清空",
+        confirmClass: "bg-rose-500 hover:bg-rose-600",
+        onConfirm: () => {
+          if (!AppState.cleaningRecords) AppState.cleaningRecords = {};
+          const semId = AppState.currentSemesterId || '115-1';
+          const wNum = AppState.currentWeekNum || 1;
+          const prefix = `${semId}_${wNum}_`;
+          Object.keys(AppState.cleaningRecords).forEach(k => {
+            if (k.startsWith(prefix)) delete AppState.cleaningRecords[k];
+          });
+          saveToLocal();
+          renderCleaningTasks();
+          showCustomToast("已清空本週打掃打卡紀錄", "info");
+        }
       });
-      saveToLocal();
-      renderCleaningTasks();
     };
 
     // 每週獨立負責人管理邏輯
@@ -1003,20 +1111,23 @@
 
     // 渲染生活常規檢核表
     function renderHabitsTable() {
-      const sem = AppState.semesters.find(s => s.id === AppState.currentSemesterId) || AppState.semesters[0];
-      const days = getWeekDays(sem.startDate, AppState.currentWeekNum);
+      const sem = (AppState.semesters || []).find(s => s.id === AppState.currentSemesterId) || AppState.semesters?.[0] || DEFAULT_DATA.semesters[0];
+      const curWeek = AppState.currentWeekNum || 1;
+      const curSemId = sem.id || '115-1';
+      const days = getWeekDays(sem.startDate, curWeek);
+      const habits = AppState.habitsRecords || {};
 
       document.getElementById('thMon').innerHTML = `週一<br><span class="text-[10px] text-amber-800/60 font-medium">${days[0]}</span>`;
       document.getElementById('thTue').innerHTML = `週二<br><span class="text-[10px] text-amber-800/60 font-medium">${days[1]}</span>`;
       document.getElementById('thWed').innerHTML = `週三<br><span class="text-[10px] text-amber-800/60 font-medium">${days[2]}</span>`;
       document.getElementById('thThu').innerHTML = `週四<br><span class="text-[10px] text-amber-800/60 font-medium">${days[3]}</span>`;
       document.getElementById('thFri').innerHTML = `週五<br><span class="text-[10px] text-amber-800/60 font-medium">${days[4]}</span>`;
-      document.getElementById('currentWeekDateRange').textContent = `${sem.year}學年度 ${sem.term} ‧ 第 ${AppState.currentWeekNum} 週 (${days[0]} ~ ${days[4]})`;
+      document.getElementById('currentWeekDateRange').textContent = `${sem.year}學年度 ${sem.term} ‧ 第 ${curWeek} 週 (${days[0]} ~ ${days[4]})`;
 
       const tbody = document.getElementById('habitsTableBody');
       tbody.innerHTML = '';
 
-      AppState.students.forEach((stu) => {
+      (AppState.students || []).forEach((stu) => {
         const cObj = getColorObj(stu.color);
 
         HABIT_CATEGORIES.forEach((cat, catIdx) => {
@@ -1053,8 +1164,8 @@
           let daysHtml = '';
           let count = 0;
           for (let d = 0; d < 5; d++) {
-            const recordKey = `${AppState.currentSemesterId}_${AppState.currentWeekNum}_${stu.id}_${cat.key}_${d}`;
-            const checked = !!AppState.habitsRecords[recordKey];
+            const recordKey = `${curSemId}_${curWeek}_${stu.id}_${cat.key}_${d}`;
+            const checked = !!habits[recordKey];
             if (checked) count++;
 
             daysHtml += `
@@ -1092,13 +1203,16 @@
       const vipTue = [];
       const vipThu = [];
       const vipFri = [];
+      const curSemId = AppState.currentSemesterId || '115-1';
+      const curWeek = AppState.currentWeekNum || 1;
+      const habits = AppState.habitsRecords || {};
 
-      AppState.students.forEach(stu => {
+      (AppState.students || []).forEach(stu => {
         HABIT_CATEGORIES.forEach(cat => {
           let count = 0;
           for (let d = 0; d < 5; d++) {
-            const key = `${AppState.currentSemesterId}_${AppState.currentWeekNum}_${stu.id}_${cat.key}_${d}`;
-            if (AppState.habitsRecords[key]) count++;
+            const key = `${curSemId}_${curWeek}_${stu.id}_${cat.key}_${d}`;
+            if (habits[key]) count++;
           }
           if (count === 5) {
             if (cat.key === 'resp') vipMon.push(stu);
@@ -1146,12 +1260,13 @@
 
     function renderCleaningArea(zoneKey, containerId, badgeId, crownId, activeClass, checkBtnColor) {
       const container = document.getElementById(containerId);
-      const tasks = AppState.cleaningTasks[zoneKey] || [];
+      if (!container) return;
+      const tasks = (AppState.cleaningTasks && AppState.cleaningTasks[zoneKey]) || DEFAULT_DATA.cleaningTasks[zoneKey] || [];
       let completedCount = 0;
 
       container.innerHTML = tasks.map(task => {
         const recordKey = `${AppState.currentSemesterId}_${AppState.currentWeekNum}_${task.id}`;
-        const isDone = !!AppState.cleaningRecords[recordKey];
+        const isDone = !!(AppState.cleaningRecords && AppState.cleaningRecords[recordKey]);
         if (isDone) completedCount++;
 
         return `
@@ -1175,28 +1290,33 @@
         `;
       }).join('');
 
-      document.getElementById(badgeId).textContent = `${completedCount}/${tasks.length} 完成`;
+      const badge = document.getElementById(badgeId);
+      if (badge) badge.textContent = `${completedCount}/${tasks.length} 完成`;
 
       const crown = document.getElementById(crownId);
-      if (tasks.length > 0 && completedCount === tasks.length) {
-        crown.classList.remove('hidden');
-      } else {
-        crown.classList.add('hidden');
+      if (crown) {
+        if (tasks.length > 0 && completedCount === tasks.length) {
+          crown.classList.remove('hidden');
+        } else {
+          crown.classList.add('hidden');
+        }
       }
     }
 
     // 渲染專職收納櫃卡片
     function renderCabinetsArea() {
       const container = document.getElementById('tasksCabinets');
-      const tasks = AppState.cleaningTasks.cabinets || [];
+      if (!container) return;
+      const tasks = (AppState.cleaningTasks && AppState.cleaningTasks.cabinets) || DEFAULT_DATA.cleaningTasks.cabinets || [];
       const currentAssignees = getCurrentWeekAssignees();
 
       container.innerHTML = tasks.map(task => {
         const recordKey = `${AppState.currentSemesterId}_${AppState.currentWeekNum}_${task.id}`;
-        const isDone = !!AppState.cleaningRecords[recordKey];
+        const isDone = !!(AppState.cleaningRecords && AppState.cleaningRecords[recordKey]);
         const assignedStuId = currentAssignees.cabinets ? currentAssignees.cabinets[task.id] : '';
         const assignedStu = getStudentById(assignedStuId);
         const cObj = assignedStu ? getColorObj(assignedStu.color) : null;
+        const dropdownId = `dropdown_cabinet_${task.id}`;
 
         return `
           <div class="rounded-2xl border p-2 flex flex-col justify-between transition ${
@@ -1216,23 +1336,42 @@
               </div>
             </div>
 
+            <!-- 專職學生自訂下拉選單（展開時顯示每位學生的顏色圖示） -->
             <div class="relative">
-              <select onchange="updateCabinetAssignee('${task.id}', this.value)" class="w-full text-[11px] font-bold bg-white/80 border border-rose-200 rounded-xl py-1 pl-5 pr-2 outline-none cursor-pointer text-center">
-                <option value="">未指派</option>
-                ${AppState.students.map(s => `
-                  <option value="${s.id}" ${s.id === assignedStuId ? 'selected' : ''}>${s.name}</option>
-                `).join('')}
-              </select>
-              ${cObj ? `
-                <span class="absolute left-2 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full pointer-events-none" style="background-color: ${cObj.hex};"></span>
-              ` : ''}
+              <button type="button" onclick="toggleDropdown('${dropdownId}', event)" 
+                      class="w-full text-[11px] font-bold bg-white/90 border border-rose-200 hover:border-rose-300 rounded-xl py-1 px-2 outline-none cursor-pointer flex items-center justify-between shadow-2xs">
+                <div class="flex items-center gap-1.5 truncate">
+                  ${cObj ? `<span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs" style="background-color: ${cObj.hex};"></span>` : `<span class="w-2.5 h-2.5 rounded-full shrink-0 bg-slate-300"></span>`}
+                  <span class="truncate font-black text-slate-800">${assignedStu ? assignedStu.name : '未指派'}</span>
+                </div>
+                <i class="fa-solid fa-chevron-down text-[9px] text-slate-400 shrink-0 ml-1"></i>
+              </button>
+
+              <div id="${dropdownId}" class="custom-assignee-menu hidden absolute bottom-full sm:bottom-auto sm:top-full left-0 mb-1 sm:mb-0 sm:mt-1 w-full min-w-[110px] bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-44 overflow-y-auto custom-scrollbar py-1">
+                <button type="button" onclick="selectCabinetAssignee('${task.id}', '')" 
+                        class="w-full text-left px-2.5 py-1.5 text-xs hover:bg-rose-50 text-slate-500 flex items-center gap-2 font-bold">
+                  <span class="w-2.5 h-2.5 rounded-full bg-slate-200 shrink-0"></span>
+                  <span>未指派</span>
+                </button>
+                ${(AppState.students || []).map(s => {
+                  const sColor = getColorObj(s.color);
+                  const isSelected = s.id === assignedStuId;
+                  return `
+                    <button type="button" onclick="selectCabinetAssignee('${task.id}', '${s.id}')" 
+                            class="w-full text-left px-2.5 py-1.5 text-xs hover:bg-rose-50 flex items-center gap-2 transition ${isSelected ? 'bg-rose-100/60 font-black text-rose-950' : 'font-bold text-slate-800'}">
+                      <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs" style="background-color: ${sColor.hex};"></span>
+                      <span class="truncate">${s.name}</span>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    // 渲染負責人標籤
+    // 渲染負責人標籤（展開時顯示每位學生的顏色圖示）
     function renderAssigneesList(zone, containerId, countElemId) {
       const container = document.getElementById(containerId);
       const currentAssignees = getCurrentWeekAssignees();
@@ -1246,17 +1385,41 @@
       container.innerHTML = list.map((stuId, idx) => {
         const stu = getStudentById(stuId);
         const cObj = stu ? getColorObj(stu.color) : null;
+        const dropdownId = `dropdown_zone_${zone}_${idx}`;
 
         return `
           <div class="w-[108px] shrink-0 relative flex items-center bg-white border border-slate-200 rounded-xl px-1 py-0.5 shadow-2xs">
-            ${cObj ? `<span class="w-2 h-2 rounded-full shrink-0 ml-1" style="background-color: ${cObj.hex};"></span>` : ''}
-            <select onchange="updateAssignee('${zone}', ${idx}, this.value)" class="w-full text-center text-xs font-black text-slate-800 bg-transparent py-1 outline-none cursor-pointer">
-              <option value="">未指派</option>
-              ${AppState.students.map(s => `
-                <option value="${s.id}" ${s.id === stuId ? 'selected' : ''}>${s.name}</option>
-              `).join('')}
-            </select>
-            <button onclick="removeAssignee('${zone}', ${idx})" class="text-slate-300 hover:text-rose-500 text-[10px] px-1" title="刪除此欄位">
+            <div class="relative flex-1 min-w-0">
+              <button type="button" onclick="toggleDropdown('${dropdownId}', event)" 
+                      class="w-full text-xs font-black text-slate-800 bg-transparent py-1 px-1 flex items-center justify-between cursor-pointer outline-none">
+                <div class="flex items-center gap-1.5 truncate">
+                  ${cObj ? `<span class="w-2 h-2 rounded-full shrink-0 shadow-2xs" style="background-color: ${cObj.hex};"></span>` : `<span class="w-2 h-2 rounded-full shrink-0 bg-slate-300"></span>`}
+                  <span class="truncate">${stu ? stu.name : '未指派'}</span>
+                </div>
+                <i class="fa-solid fa-chevron-down text-[8px] text-slate-400 shrink-0 ml-0.5"></i>
+              </button>
+
+              <div id="${dropdownId}" class="custom-assignee-menu hidden absolute bottom-full sm:bottom-auto sm:top-full left-0 mb-1 sm:mb-0 sm:mt-1 w-32 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-44 overflow-y-auto custom-scrollbar py-1">
+                <button type="button" onclick="selectZoneAssignee('${zone}', ${idx}, '')" 
+                        class="w-full text-left px-2.5 py-1.5 text-xs hover:bg-amber-50 text-slate-500 flex items-center gap-2 font-bold">
+                  <span class="w-2 h-2 rounded-full bg-slate-200 shrink-0"></span>
+                  <span>未指派</span>
+                </button>
+                ${(AppState.students || []).map(s => {
+                  const sColor = getColorObj(s.color);
+                  const isSelected = s.id === stuId;
+                  return `
+                    <button type="button" onclick="selectZoneAssignee('${zone}', ${idx}, '${s.id}')" 
+                            class="w-full text-left px-2.5 py-1.5 text-xs hover:bg-amber-50 flex items-center gap-2 transition ${isSelected ? 'bg-amber-100/70 font-black text-amber-950' : 'font-bold text-slate-800'}">
+                      <span class="w-2 h-2 rounded-full shrink-0 shadow-2xs" style="background-color: ${sColor.hex};"></span>
+                      <span class="truncate">${s.name}</span>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <button onclick="removeAssignee('${zone}', ${idx})" class="text-slate-300 hover:text-rose-500 text-[10px] px-1 shrink-0" title="刪除此欄位">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -1264,7 +1427,38 @@
       }).join('');
     }
 
-    // 學生名單 Modal 控制
+    // 自訂下拉選單控制邏輯
+    window.toggleDropdown = function(dropdownId, event) {
+      if (event) event.stopPropagation();
+      const el = document.getElementById(dropdownId);
+      const isHidden = el.classList.contains('hidden');
+      // 關閉其他開啟的選單
+      document.querySelectorAll('.custom-assignee-menu').forEach(menu => {
+        menu.classList.add('hidden');
+      });
+      if (isHidden) {
+        el.classList.remove('hidden');
+      }
+    };
+
+    window.selectZoneAssignee = function(zone, idx, stuId) {
+      updateAssignee(zone, idx, stuId);
+      document.querySelectorAll('.custom-assignee-menu').forEach(menu => menu.classList.add('hidden'));
+    };
+
+    window.selectCabinetAssignee = function(cbTaskId, stuId) {
+      updateCabinetAssignee(cbTaskId, stuId);
+      document.querySelectorAll('.custom-assignee-menu').forEach(menu => menu.classList.add('hidden'));
+    };
+
+    // 點擊空白處自動關閉下拉選單
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.custom-assignee-menu')) {
+        document.querySelectorAll('.custom-assignee-menu').forEach(menu => menu.classList.add('hidden'));
+      }
+    });
+
+    // 學生名單 Modal 控制（如圖 1 橫向排版圓形色票）
     window.openStudentModal = function() {
       if (!isTeacherLoggedIn) {
         toggleTeacherAuth();
@@ -1281,18 +1475,45 @@
     function renderStudentModalRows() {
       const container = document.getElementById('studentListContainer');
       container.innerHTML = AppState.students.map((stu, idx) => `
-        <div class="flex items-center gap-2 p-2 bg-slate-50 rounded-2xl border border-slate-200">
-          <span class="text-xs font-bold text-slate-400 w-5 text-center">${idx + 1}</span>
-          <input type="text" id="stuName_${idx}" value="${stu.name}" class="flex-1 text-xs font-bold px-2.5 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-amber-500">
-          <select id="stuColor_${idx}" class="text-xs font-bold px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white">
-            ${PRESET_COLORS.map(c => `
-              <option value="${c.name}" ${c.name === stu.color ? 'selected' : ''}>${c.name}</option>
-            `).join('')}
-          </select>
-          <button onclick="deleteStudentRow(${idx})" class="text-slate-400 hover:text-rose-500 px-2 py-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
+        <div class="flex items-center gap-1.5 sm:gap-2.5 p-2 sm:p-2.5 bg-slate-50 rounded-2xl border border-slate-200 hover:border-slate-300 transition">
+          <span class="text-xs font-black text-slate-400 w-5 text-center shrink-0">${idx + 1}</span>
+          <input type="text" id="stuName_${idx}" value="${stu.name}" 
+                 class="w-20 sm:w-28 text-xs sm:text-sm font-black px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-300 text-slate-800 shrink-0">
+          
+          <!-- 8色圓形色票：精簡間距且完整展示，無捲軸橫向一次呈現 -->
+          <div class="flex items-center justify-center gap-1 sm:gap-1.5 flex-1 py-2 px-2 overflow-visible">
+            ${PRESET_COLORS.map(c => {
+              const isSelected = (c.name === stu.color);
+              return `
+                <button type="button" onclick="selectStudentColorInModal(${idx}, '${c.name}')" 
+                        class="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full transition-all shrink-0 cursor-pointer ${
+                          isSelected 
+                            ? 'ring-2 ring-indigo-600 ring-offset-2 scale-105 shadow-sm z-10' 
+                            : 'opacity-85 hover:opacity-100 hover:scale-110'
+                        }"
+                        style="background-color: ${c.hex};"
+                        title="${c.name}">
+                </button>
+              `;
+            }).join('')}
+          </div>
+
+          <button onclick="deleteStudentRow(${idx})" class="text-slate-400 hover:text-rose-500 px-1.5 py-1 shrink-0 transition" title="刪除此學生">
+            <i class="fa-solid fa-trash-can text-xs"></i>
+          </button>
         </div>
       `).join('');
     }
+
+    window.selectStudentColorInModal = function(idx, colorName) {
+      if (AppState.students[idx]) {
+        // 同步輸入框目前的值
+        const nameInput = document.getElementById(`stuName_${idx}`);
+        if (nameInput) AppState.students[idx].name = nameInput.value.trim() || `學生${idx+1}`;
+        AppState.students[idx].color = colorName;
+        renderStudentModalRows();
+      }
+    };
 
     window.addNewStudentRow = function() {
       const newId = 's_' + Date.now();
@@ -1302,7 +1523,7 @@
 
     window.deleteStudentRow = function(idx) {
       if (AppState.students.length <= 1) {
-        alert("至少需保留一位學生");
+        showCustomToast("至少需保留一位學生！", "error");
         return;
       }
       AppState.students.splice(idx, 1);
@@ -1312,13 +1533,12 @@
     window.saveStudentsData = function() {
       AppState.students.forEach((stu, idx) => {
         const nameInput = document.getElementById(`stuName_${idx}`);
-        const colorSelect = document.getElementById(`stuColor_${idx}`);
         if (nameInput) stu.name = nameInput.value.trim() || `學生${idx+1}`;
-        if (colorSelect) stu.color = colorSelect.value;
       });
       saveToLocal();
       closeStudentModal();
       renderAll();
+      showCustomToast("學生名單已成功儲存並同步", "success");
     };
 
     // 學期日程 Modal 控制
@@ -1381,7 +1601,7 @@
 
     window.deleteSemesterRow = function(idx) {
       if (AppState.semesters.length <= 1) {
-        alert("至少需保留一個學期日程");
+        showCustomToast("至少需保留一個學期日程！", "error");
         return;
       }
       AppState.semesters.splice(idx, 1);
@@ -1398,6 +1618,7 @@
       saveToLocal();
       closeSemesterModal();
       renderAll();
+      showCustomToast("學期日程已成功儲存並同步", "success");
     };
 
     // 打掃工作設定 Modal 控制
@@ -1497,7 +1718,7 @@
     };
 
     // ==========================================
-    // 資料匯出核心功能 (生活習慣、打掃工作、學生名單、JSON備份)
+    // 資料匯出功能
     // ==========================================
     window.openExportModal = function() {
       document.getElementById('exportModal').classList.remove('hidden');
@@ -1546,7 +1767,7 @@
       downloadFile(csv, fileName, 'text/csv;charset=utf-8;');
     };
 
-    // 2. 匯出打掃工作紀錄與每週負責人 CSV
+    // 2. 匯出打掃工作紀錄 CSV
     window.exportCleaningCSV = function() {
       const sem = AppState.semesters.find(s => s.id === AppState.currentSemesterId) || AppState.semesters[0];
       let csv = '\uFEFF';
@@ -1595,155 +1816,443 @@
       let csv = '\uFEFF';
       csv += `編號,學生姓名,代表色名稱,代表色代碼\n`;
 
-      AppState.students.forEach((stu, idx) => {
-        const colorObj = getColorObj(stu.color);
-        csv += `"${idx + 1}","${stu.name}","${stu.color}","${colorObj.hex}"\n`;
+      (AppState.students || []).forEach((stu, idx) => {
+        const cObj = getColorObj(stu.color);
+        csv += `"${idx + 1}","${stu.name}","${stu.color}","${cObj?.hex || ''}"\n`;
       });
 
-      const fileName = `學生名單與代表色_${new Date().toISOString().slice(0, 10)}.csv`;
+      const fileName = `學生名單_${new Date().toISOString().slice(0, 10)}.csv`;
       downloadFile(csv, fileName, 'text/csv;charset=utf-8;');
     };
 
-    // 4. 匯出系統完整 JSON 備份檔
+    // 4. 匯出系統完整 JSON 備份檔（一鍵匯出所有資料）
     window.exportFullJSON = function() {
       const dataToExport = {
+        system: "學生生活常規全記錄",
         exportedAt: new Date().toISOString(),
-        version: "2.0",
+        version: "2.1",
+        summary: {
+          studentCount: AppState.students?.length || 0,
+          semesterCount: AppState.semesters?.length || 0,
+          habitsRecordCount: Object.keys(AppState.habitsRecords || {}).length,
+          cleaningRecordCount: Object.keys(AppState.cleaningRecords || {}).length
+        },
         appState: AppState
       };
       const jsonStr = JSON.stringify(dataToExport, null, 2);
-      const fileName = `學生生活常規全記錄_完整備份_${new Date().toISOString().slice(0, 10)}.json`;
+      const sem = AppState.semesters.find(s => s.id === AppState.currentSemesterId) || AppState.semesters[0];
+      const fileName = `學生生活常規全記錄_完整全資料備份包_${sem?.year || '115'}學年_${new Date().toISOString().slice(0, 10)}.json`;
       downloadFile(jsonStr, fileName, 'application/json;charset=utf-8;');
+      showCustomToast("已成功一鍵匯出全部資料備份包！", "success");
     };
 
     // ==========================================
-    // 資料匯入功能（僅限教師登入狀態操作）
+    // 資料匯入功能（全新升級：智慧識別、自訂確認視窗、雙編碼支援）
     // ==========================================
+    let parsedImportPayload = null;
+
+    // 自訂非阻塞式確認視窗
+    function showCustomConfirm(options) {
+      const modal = document.getElementById('customConfirmModal');
+      const title = document.getElementById('customConfirmTitle');
+      const message = document.getElementById('customConfirmMessage');
+      const okBtn = document.getElementById('btnCustomConfirmOk');
+      const cancelBtn = document.getElementById('btnCustomConfirmCancel');
+
+      title.textContent = options.title || '確認操作';
+      message.textContent = options.message || '您確定要繼續執行嗎？';
+      okBtn.textContent = options.confirmText || '確定';
+      okBtn.className = `px-4 py-1.5 text-xs font-black text-white rounded-xl shadow-xs transition ${options.confirmClass || 'bg-amber-500 hover:bg-amber-600'}`;
+
+      const handleOk = () => {
+        cleanup();
+        if (typeof options.onConfirm === 'function') options.onConfirm();
+      };
+
+      const handleCancel = () => {
+        cleanup();
+        if (typeof options.onCancel === 'function') options.onCancel();
+      };
+
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        okBtn.removeEventListener('click', handleOk);
+        cancelBtn.removeEventListener('click', handleCancel);
+      };
+
+      okBtn.addEventListener('click', handleOk);
+      cancelBtn.addEventListener('click', handleCancel);
+      modal.classList.remove('hidden');
+    }
+
+    // 自訂 Toast 提示
+    function showCustomToast(text, type = 'info') {
+      const container = document.getElementById('customToastContainer');
+      const toast = document.createElement('div');
+      
+      let bg = 'bg-slate-800 text-white';
+      let icon = '<i class="fa-solid fa-circle-info text-sky-400"></i>';
+      if (type === 'success') {
+        bg = 'bg-emerald-700 text-white';
+        icon = '<i class="fa-solid fa-circle-check text-emerald-300"></i>';
+      } else if (type === 'error') {
+        bg = 'bg-rose-700 text-white';
+        icon = '<i class="fa-solid fa-circle-exclamation text-rose-300"></i>';
+      }
+
+      toast.className = `${bg} px-4 py-2.5 rounded-2xl shadow-xl text-xs font-black flex items-center gap-2 transition-all duration-300 transform translate-y-2 pointer-events-auto border border-white/10`;
+      toast.innerHTML = `${icon} <span>${text}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 350);
+      }, 3000);
+    }
+
     window.openImportModal = function() {
       if (!isTeacherLoggedIn) {
         toggleTeacherAuth();
         return;
       }
-      document.getElementById('jsonFileNameDisplay').textContent = '尚未選取檔案';
-      document.getElementById('csvFileNameDisplay').textContent = '尚未選取檔案';
-      document.getElementById('jsonFileInput').value = '';
-      document.getElementById('csvFileInput').value = '';
+      resetImportFileInput();
       document.getElementById('importModal').classList.remove('hidden');
     };
 
     window.closeImportModal = function() {
       document.getElementById('importModal').classList.add('hidden');
+      resetImportFileInput();
     };
 
-    // 處理 JSON 完整備份檔讀取與還原
-    window.handleJsonFileSelect = function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      document.getElementById('jsonFileNameDisplay').textContent = file.name;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          let targetState = null;
-
-          if (parsed && parsed.appState && typeof parsed.appState === 'object') {
-            targetState = parsed.appState;
-          } else if (parsed && parsed.students && parsed.semesters) {
-            targetState = parsed;
-          }
-
-          if (!targetState || !Array.isArray(targetState.students) || !Array.isArray(targetState.semesters)) {
-            alert("匯入失敗：選取的檔案不是有效的系統備份 JSON 格式！");
-            return;
-          }
-
-          if (confirm(`確定要匯入「${file.name}」嗎？\n這將更新目前的學生名單、學期日程、生活檢核與打掃紀錄，並同步至雲端。`)) {
-            targetState.isTeacherLoggedIn = isTeacherLoggedIn;
-            if (!targetState.weekAssignees) targetState.weekAssignees = {};
-            AppState = targetState;
-            saveToLocal(true);
-            renderAll();
-            closeImportModal();
-            alert("備份資料匯入成功！已同步至 Firebase 雲端與本機。");
-          }
-        } catch (err) {
-          console.error("JSON 解析失敗:", err);
-          alert("檔案讀取失敗：JSON 格式毀損或不合規範。");
-        }
-      };
-      reader.readAsText(file, "UTF-8");
+    window.resetImportFileInput = function() {
+      parsedImportPayload = null;
+      const input = document.getElementById('smartFileInput');
+      if (input) input.value = '';
+      const card = document.getElementById('importFilePreviewCard');
+      if (card) card.classList.add('hidden');
     };
 
-    // 處理學生名單 CSV / TXT 匯入
-    window.handleCsvFileSelect = function(event) {
+    // 讀取檔案內容（支援 UTF-8 與 Big5 容錯）
+    function readFileContentWithEncoding(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          let text = e.target.result;
+          // 若有亂碼替換符號，嘗試用 Big5 重新讀取（因台灣 Excel 常預設存 Big5）
+          if (text.includes('\uFFFD') && file.name.endsWith('.csv')) {
+            const secondReader = new FileReader();
+            secondReader.onload = (e2) => resolve(e2.target.result);
+            secondReader.onerror = () => resolve(text);
+            try {
+              secondReader.readAsText(file, "big5");
+            } catch (err) {
+              resolve(text);
+            }
+          } else {
+            resolve(text);
+          }
+        };
+        reader.onerror = (err) => reject(err);
+        reader.readAsText(file, "utf-8");
+      });
+    }
+
+    // 處理選取檔案（智慧自動辨識檔案類型）
+    window.handleSmartFileSelect = async function(event) {
       const file = event.target.files[0];
       if (!file) return;
-      document.getElementById('csvFileNameDisplay').textContent = file.name;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const text = e.target.result;
-          const lines = text.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
-          
-          if (lines.length === 0) {
-            alert("選取的檔案內容為空！");
-            return;
-          }
+      const card = document.getElementById('importFilePreviewCard');
+      const nameEl = document.getElementById('previewFileName');
+      const typeBadge = document.getElementById('previewFileTypeBadge');
+      const sizeEl = document.getElementById('previewFileSize');
+      const summaryEl = document.getElementById('previewSummaryContent');
+      const iconEl = document.getElementById('previewFileIcon');
+      const btnTextEl = document.getElementById('btnExecuteText');
 
-          const newStudents = [];
-          lines.forEach((line, idx) => {
-            if (idx === 0 && (line.includes('姓名') || line.includes('學生') || line.includes('編號'))) {
+      nameEl.textContent = file.name;
+      sizeEl.textContent = `${(file.size / 1024).toFixed(1)} KB`;
+      card.classList.remove('hidden');
+
+      try {
+        const rawContent = await readFileContentWithEncoding(file);
+        const cleanContent = rawContent.replace(/^\uFEFF/, ''); // 移除 BOM
+
+        // 1. 嘗試解析為「一鍵匯出完整備份檔 (JSON)」
+        if (file.name.endsWith('.json') || cleanContent.trim().startsWith('{')) {
+          try {
+            const parsed = JSON.parse(cleanContent);
+            let state = parsed.appState || (parsed.students && parsed.semesters ? parsed : null);
+
+            if (state) {
+              parsedImportPayload = { type: 'JSON_FULL', data: state, fileName: file.name };
+              typeBadge.textContent = '📦 一鍵完整全系統備份包 (JSON)';
+              typeBadge.className = 'text-[10px] font-black text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full';
+              iconEl.innerHTML = '<i class="fa-solid fa-box-archive text-purple-600"></i>';
+              if (btnTextEl) btnTextEl.textContent = '確認一鍵還原全部資料';
+
+              const stuCount = Array.isArray(state.students) ? state.students.length : 0;
+              const semCount = Array.isArray(state.semesters) ? state.semesters.length : 0;
+              const habitsCount = state.habitsRecords ? Object.keys(state.habitsRecords).length : 0;
+              const cleaningCount = state.cleaningRecords ? Object.keys(state.cleaningRecords).length : 0;
+
+              summaryEl.innerHTML = `
+                <div class="font-black text-purple-900">✓ 成功驗證「一鍵完整全資料備份包」</div>
+                <div class="text-[11px] text-slate-600 space-y-0.5 pt-0.5">
+                  <div>• <strong>學生名單</strong>：包含 ${stuCount} 位學生及其專屬代表色</div>
+                  <div>• <strong>學期設定</strong>：包含 ${semCount} 個學期起訖週次</div>
+                  <div>• <strong>生活常規紀錄</strong>：包含 ${habitsCount} 筆責任/整潔/秩序/禮貌評核數據</div>
+                  <div>• <strong>打掃工作與輪值</strong>：包含 ${cleaningCount} 筆各週打卡及負責人配置</div>
+                </div>
+                <div class="text-[11px] text-emerald-700 font-bold bg-emerald-50 p-1.5 rounded-lg border border-emerald-200 mt-1">
+                  提示：按下下方按鈕將一次性還原全系統所有資料，並同步至 Firebase 雲端。
+                </div>
+              `;
               return;
             }
+          } catch (e) {
+            // 非有效 JSON，繼續往下嘗試 CSV 解析
+          }
+        }
 
-            const parts = line.split(',').map(p => p.replace(/^["']|["']$/g, '').trim());
-            let name = '';
-            let color = '';
+        // 2. CSV / TXT 智慧辨識 (個別匯入)
+        const lines = cleanContent.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length === 0) {
+          throw new Error("檔案內容為空");
+        }
 
-            if (parts.length >= 2) {
-              if (/^\d+$/.test(parts[0]) && parts[1]) {
-                name = parts[1];
-                color = parts[2] || '';
-              } else {
-                name = parts[0];
-                color = parts[1] || '';
-              }
-            } else {
-              name = parts[0];
-            }
+        const headerLine = lines[0];
 
-            if (name) {
-              const matchedColor = PRESET_COLORS.find(c => c.name === color);
-              const assignedColor = matchedColor ? matchedColor.name : PRESET_COLORS[newStudents.length % PRESET_COLORS.length].name;
-              newStudents.push({
-                id: 's_' + Date.now() + '_' + idx,
-                name: name,
-                color: assignedColor
-              });
-            }
-          });
+        // 2.1 生活習慣常規 CSV 辨識
+        if (headerLine.includes('生活常規項目') || (headerLine.includes('週一') && headerLine.includes('週五') && headerLine.includes('達標天數'))) {
+          parsedImportPayload = { type: 'CSV_HABITS', lines: lines, fileName: file.name };
+          typeBadge.textContent = '📄 個別檔案：生活習慣常規檢核表 (CSV)';
+          typeBadge.className = 'text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded';
+          iconEl.innerHTML = '<i class="fa-solid fa-star text-amber-500"></i>';
+          if (btnTextEl) btnTextEl.textContent = '確認匯入生活常規';
 
-          if (newStudents.length === 0) {
-            alert("未能從檔案中解析出任何有效學生姓名！");
+          summaryEl.innerHTML = `
+            <div class="font-bold text-slate-700">✓ 辨識為個別資料：生活習慣常規檢核紀錄</div>
+            <div class="text-[11px] text-slate-500 space-y-0.5">
+              <div>• 包含約 ${lines.length - 1} 筆常規檢核紀錄</div>
+              <div>• 匯入後將僅覆蓋對應學期與週次的責任、整潔、秩序、禮貌達標紀錄</div>
+            </div>
+          `;
+          return;
+        }
+
+        // 2.2 打掃工作與負責人 CSV 辨識
+        if (headerLine.includes('區域/類別') || headerLine.includes('工作名稱') || headerLine.includes('指派負責學生')) {
+          parsedImportPayload = { type: 'CSV_CLEANING', lines: lines, fileName: file.name };
+          typeBadge.textContent = '📄 個別檔案：打掃工作與負責人紀錄 (CSV)';
+          typeBadge.className = 'text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded';
+          iconEl.innerHTML = '<i class="fa-solid fa-broom text-emerald-600"></i>';
+          if (btnTextEl) btnTextEl.textContent = '確認匯入打掃紀錄';
+
+          summaryEl.innerHTML = `
+            <div class="font-bold text-slate-700">✓ 辨識為個別資料：打掃工作與負責人紀錄</div>
+            <div class="text-[11px] text-slate-500 space-y-0.5">
+              <div>• 包含約 ${lines.length - 1} 筆打掃項目與負責人設定</div>
+              <div>• 匯入後將更新每週輪值負責人名單與打卡完成進度</div>
+            </div>
+          `;
+          return;
+        }
+
+        // 2.3 學生名單 CSV / TXT 辨識（預設或純名單）
+        const studentCandidates = [];
+        lines.forEach((line, idx) => {
+          if (idx === 0 && (line.includes('姓名') || line.includes('學生') || line.includes('編號') || line.includes('代表色'))) {
             return;
           }
+          const parts = line.split(',').map(p => p.replace(/^["']|["']$/g, '').trim());
+          let name = '';
+          let color = '';
 
-          if (confirm(`成功解析到 ${newStudents.length} 位學生！\n確定要將現有學生名單替換為這批學生嗎？`)) {
-            AppState.students = newStudents;
-            saveToLocal(true);
-            renderAll();
-            closeImportModal();
-            alert("學生名單已成功匯入並同步至雲端！");
+          if (parts.length >= 2) {
+            if (/^\d+$/.test(parts[0]) && parts[1]) {
+              name = parts[1];
+              color = parts[2] || '';
+            } else {
+              name = parts[0];
+              color = parts[1] || '';
+            }
+          } else {
+            name = parts[0];
           }
-        } catch (err) {
-          console.error("名單檔案解析失敗:", err);
-          alert("學生名單讀取解析出錯，請確認檔案編碼為 UTF-8。");
+
+          if (name && name.length <= 10) {
+            const matchedColor = PRESET_COLORS.find(c => c.name === color);
+            const assignedColor = matchedColor ? matchedColor.name : PRESET_COLORS[studentCandidates.length % PRESET_COLORS.length].name;
+            studentCandidates.push({
+              id: 's_' + Date.now() + '_' + idx,
+              name: name,
+              color: assignedColor
+            });
+          }
+        });
+
+        if (studentCandidates.length > 0) {
+          parsedImportPayload = { type: 'CSV_STUDENTS', data: studentCandidates, fileName: file.name };
+          typeBadge.textContent = '📄 個別檔案：學生名單 (.csv / .txt)';
+          typeBadge.className = 'text-[10px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded';
+          iconEl.innerHTML = '<i class="fa-solid fa-users text-sky-600"></i>';
+          if (btnTextEl) btnTextEl.textContent = '確認匯入學生名單';
+
+          summaryEl.innerHTML = `
+            <div class="font-bold text-slate-700">✓ 辨識為個別資料：學生名單檔案</div>
+            <div class="text-[11px] text-slate-500 space-y-0.5">
+              <div>• 解析出 ${studentCandidates.length} 位學生：${studentCandidates.map(s => s.name).slice(0, 6).join('、')}${studentCandidates.length > 6 ? ' 等' : ''}</div>
+              <div>• 系統已自動配置 8 色馬卡龍代表色</div>
+            </div>
+          `;
+          return;
         }
-      };
-      reader.readAsText(file, "UTF-8");
+
+        throw new Error("無法辨識的檔案內容格式");
+      } catch (err) {
+        console.error("檔案解析失敗:", err);
+        parsedImportPayload = null;
+        typeBadge.textContent = '無法辨識';
+        typeBadge.className = 'text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded';
+        iconEl.innerHTML = '<i class="fa-solid fa-circle-exclamation text-rose-500"></i>';
+        summaryEl.innerHTML = `<span class="text-rose-600 font-bold">無法讀取或解析此檔案。請確認是否為系統匯出的完整備份包或 UTF-8 編碼名單。</span>`;
+      }
     };
+
+    // 確認並執行匯入
+    window.confirmAndExecuteImport = function() {
+      if (!parsedImportPayload) {
+        showCustomToast("請先選取有效的檔案！", "error");
+        return;
+      }
+
+      showCustomConfirm({
+        title: "確定匯入檔案？",
+        message: `即將匯入「${parsedImportPayload.fileName}」，這將更新對應的班級資料並同步至雲端。`,
+        confirmText: "確認並同步",
+        confirmClass: "bg-emerald-600 hover:bg-emerald-700",
+        onConfirm: () => {
+          try {
+            executeActualImport(parsedImportPayload);
+          } catch (e) {
+            console.error("執行匯入異常:", e);
+            showCustomToast("匯入執行失敗，請檢查資料結構。", "error");
+          }
+        }
+      });
+    };
+
+    // 核心匯入執行器
+    function executeActualImport(payload) {
+      if (payload.type === 'JSON_FULL') {
+        const targetState = payload.data;
+        targetState.isTeacherLoggedIn = isTeacherLoggedIn;
+        AppState = sanitizeAppState(targetState);
+        saveToLocal(true);
+        renderAll();
+        closeImportModal();
+        showCustomToast("系統完整備份已成功還原並同步至雲端！", "success");
+      } 
+      else if (payload.type === 'CSV_STUDENTS') {
+        AppState.students = payload.data;
+        saveToLocal(true);
+        renderAll();
+        closeImportModal();
+        showCustomToast(`成功匯入 ${payload.data.length} 位學生名單！`, "success");
+      }
+      else if (payload.type === 'CSV_HABITS') {
+        // 解析生活習慣 CSV
+        const lines = payload.lines;
+        let importedRecords = 0;
+        if (!AppState.habitsRecords) AppState.habitsRecords = {};
+
+        // 尋找對應學生與項目的映射
+        lines.slice(1).forEach(line => {
+          const parts = line.split(',').map(p => p.replace(/^["']|["']$/g, '').trim());
+          if (parts.length >= 11) {
+            const year = parts[0];
+            const term = parts[1];
+            const weekStr = parts[2];
+            const stuName = parts[3];
+            const catName = parts[5];
+            const days = [parts[6], parts[7], parts[8], parts[9], parts[10]];
+
+            const sem = AppState.semesters.find(s => s.year === year && s.term === term) || AppState.semesters[0];
+            const stu = AppState.students.find(s => s.name === stuName);
+            const cat = HABIT_CATEGORIES.find(c => c.name === catName);
+            const wMatch = weekStr.match(/\d+/);
+            const weekNum = wMatch ? parseInt(wMatch[0], 10) : 1;
+
+            if (sem && stu && cat) {
+              days.forEach((dayVal, dIdx) => {
+                const key = `${sem.id}_${weekNum}_${stu.id}_${cat.key}_${dIdx}`;
+                AppState.habitsRecords[key] = (dayVal === '達標' || dayVal === 'true' || dayVal === '1');
+                importedRecords++;
+              });
+            }
+          }
+        });
+
+        saveToLocal(true);
+        renderHabitsTable();
+        renderVIPBadges();
+        closeImportModal();
+        showCustomToast(`生活習慣常規紀錄已更新（解析 ${importedRecords} 筆數據）！`, "success");
+      }
+      else if (payload.type === 'CSV_CLEANING') {
+        // 解析打掃工作 CSV
+        const lines = payload.lines;
+        let importedCount = 0;
+        if (!AppState.cleaningRecords) AppState.cleaningRecords = {};
+
+        lines.slice(1).forEach(line => {
+          const parts = line.split(',').map(p => p.replace(/^["']|["']$/g, '').trim());
+          if (parts.length >= 7) {
+            const year = parts[0];
+            const term = parts[1];
+            const weekStr = parts[2];
+            const zoneName = parts[3];
+            const taskName = parts[4];
+            const assigneesNames = parts[5];
+            const isDone = (parts[6] === '已完成' || parts[6] === 'true');
+
+            const sem = AppState.semesters.find(s => s.year === year && s.term === term) || AppState.semesters[0];
+            const wMatch = weekStr.match(/\d+/);
+            const weekNum = wMatch ? parseInt(wMatch[0], 10) : 1;
+
+            if (sem) {
+              const weekKey = `${sem.id}_${weekNum}`;
+              if (!AppState.weekAssignees[weekKey]) {
+                AppState.weekAssignees[weekKey] = JSON.parse(JSON.stringify(AppState.assignees || BASE_DEFAULT_ASSIGNEES));
+              }
+
+              // 尋找工作項目 ID
+              let targetTaskId = null;
+              Object.keys(AppState.cleaningTasks).forEach(zKey => {
+                const found = AppState.cleaningTasks[zKey]?.find(t => t.name === taskName);
+                if (found) targetTaskId = found.id;
+              });
+
+              if (targetTaskId) {
+                const recordKey = `${sem.id}_${weekNum}_${targetTaskId}`;
+                AppState.cleaningRecords[recordKey] = isDone;
+                importedCount++;
+              }
+            }
+          }
+        });
+
+        saveToLocal(true);
+        renderCleaningTasks();
+        closeImportModal();
+        showCustomToast(`打掃工作紀錄已成功匯入更新！`, "success");
+      }
+    }
 
     // 總渲染進入點
     function renderAll() {
@@ -1767,6 +2276,9 @@
     // 初始化載入
     window.addEventListener('DOMContentLoaded', () => {
       renderAll();
+      if (window.db && typeof window.initFirebaseSync === 'function') {
+        window.initFirebaseSync();
+      }
     });
   </script>
 </body>
